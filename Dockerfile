@@ -62,7 +62,7 @@ ARG PREFIX_DIR=/opt/guacamole
 # needed)
 #
 ARG WITH_FREERDP='2(\.\d+)+'
-ARG WITH_LIBSSH2='libssh2-\d+(\.\d+)+'
+ARG WITH_LIBSSH2='pr-626'
 ARG WITH_LIBTELNET='\d+(\.\d+)+'
 ARG WITH_LIBVNCCLIENT='LibVNCServer-\d+(\.\d+)+'
 ARG WITH_LIBWEBSOCKETS='v\d+(\.\d+)+'
