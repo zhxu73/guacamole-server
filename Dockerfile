@@ -61,9 +61,9 @@ ARG PREFIX_DIR=/opt/guacamole
 # library (these can be overridden at build time if a specific version is
 # needed)
 #
-ARG WITH_FREERDP='2(\.\d+)+'
+ARG WITH_FREERDP='NO'
 ARG WITH_LIBSSH2='pr-626'
-ARG WITH_LIBTELNET='\d+(\.\d+)+'
+ARG WITH_LIBTELNET='NO'
 ARG WITH_LIBVNCCLIENT='LibVNCServer-\d+(\.\d+)+'
 ARG WITH_LIBWEBSOCKETS='v\d+(\.\d+)+'
 
