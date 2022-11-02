@@ -22,7 +22,7 @@
 #
 
 # The Ubuntu image that should be used as the basis for the guacd image
-ARG UBUNTU_BASE_IMAGE=21.10
+ARG UBUNTU_BASE_IMAGE=22.04
 
 # Use Debian as base for the build
 FROM ubuntu:${UBUNTU_BASE_IMAGE} AS builder
@@ -34,7 +34,7 @@ FROM ubuntu:${UBUNTU_BASE_IMAGE} AS builder
 # NOTE: Due to limitations of the Docker image build process, this value is
 # duplicated in an ARG in the second stage of the build.
 #
-ARG UBUNTU_RELEASE=impish-backports
+ARG UBUNTU_RELEASE=jammy
 
 # Add repository for specified Ubuntu release if not already present in
 # sources.list
@@ -62,7 +62,6 @@ ARG BUILD_DEPENDENCIES="              \
         libossp-uuid-dev              \
         libpango1.0-dev               \
         libpulse-dev                  \
-        libssh2-1-dev                 \
         libssl-dev                    \
         libtelnet-dev                 \
         libtool                       \
@@ -78,6 +77,24 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update                                              && \
     apt-get install -t ${UBUNTU_RELEASE} -y $BUILD_DEPENDENCIES && \
     rm -rf /var/lib/apt/lists/*
+
+##############################
+# libssh2 build
+##############################
+RUN DEBIAN_FRONTEND=noninteractive apt-get update           && \
+    apt-get install -y cmake build-essential libssl-dev zlib1g-dev git && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN git clone https://github.com/libssh2/libssh2.git /opt/libssh2 && \
+    cd /opt/libssh2                                               && \
+    git fetch origin pull/626/head:PR-626
+
+RUN cd /opt/libssh2 && mkdir bin && cd bin                                        && \
+    cmake -DBUILD_EXAMPLES=OFF -DBUILD_SHARED_LIBS=ON -DCRYPTO_BACKEND=OpenSSL .. && \
+    cmake --build . --target install && \
+    mkdir -p ${PREFIX_DIR}/lib/      && \
+    cp /usr/local/lib/libssh2.so* ${PREFIX_DIR}/lib/
+##############################
 
 # Add configuration scripts
 COPY src/guacd-docker/bin "${PREFIX_DIR}/bin/"
@@ -105,7 +122,7 @@ FROM ubuntu:${UBUNTU_BASE_IMAGE}
 # NOTE: Due to limitations of the Docker image build process, this value is
 # duplicated in an ARG in the first stage of the build.
 #
-ARG UBUNTU_RELEASE=impish-backports
+ARG UBUNTU_RELEASE=jammy
 
 # Add repository for specified Ubuntu release if not already present in
 # sources.list
